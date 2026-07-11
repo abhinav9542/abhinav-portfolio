@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@import "@fontsource-variable/fraunces";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+
+@theme {
+  /* Brand colors, refined from Abhinav's design deck (grid + blob motif in
+     terracotta/navy on a warm cream field) — lighter field, warmer accent,
+     deeper navy for stronger type contrast. */
+  --color-cream: #faf6ee;
+  --color-cream-dark: #f1e8d9;
+  --color-terracotta: #d2603a;
+  --color-terracotta-dark: #a34a28;
+  --color-sand: #e7cdab;
+  /* Darkened from the deck's lighter #8a7a6d to clear WCAG AA (4.5:1) as text on cream. */
+  --color-warm-gray: #6b5c4f;
+  --color-navy: #1a2440;
+  --color-navy-soft: #33415c;
+  --color-ink: #26201a;
+  --color-white-soft: #fffdf9;
+
+  --font-display: "Fraunces Variable", "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --font-size-8xl: 6rem;
+  --font-size-9xl: 7.5rem;
+
+  --spacing-section: 8rem;
+  --spacing-section-sm: 5rem;
+
+  --shadow-soft: 0 20px 60px -15px rgba(43, 36, 28, 0.15);
+
+  --animate-marquee: marquee 32s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--color-terracotta);
+    color: var(--color-white-soft);
+  }
+
+  /* Subtle film grain over the whole site — keeps the flat cream field from
+     feeling sterile. Pointer-events off so it never intercepts interaction. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@utility text-outline-navy {
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--color-navy) 38%, transparent);
+}
