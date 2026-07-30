@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Source material — kept locally, never published. The resume carries a phone
+# number and address, and this repo is public. The site itself only needs the
+# images already extracted into public/projects/.
+*.pdf

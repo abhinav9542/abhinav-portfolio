@@ -98,6 +98,19 @@ type. On `ProjectImage`, `label` sets the eyebrow and `fit: 'contain'` is for
 drawings that must not be cropped — contained figures also drop the plate
 background so letterboxing disappears into the page.
 
+## Source material is deliberately untracked
+
+`Abhinav Tomar ATS Resume.pdf`, `Design project- Dementia.pdf` and
+`Changes/Project_02.pdf` live on disk but are **gitignored** (`*.pdf`), and were
+stripped from git history before the first push — the repo is public and the
+resume carries a phone number and address. Don't re-add them. The site never
+reads them; it only uses the images already extracted into `public/projects/`.
+
+If you ever rewrite history again: `git filter-branch --index-filter` resets the
+working tree at the end, which **deletes tracked files from disk**. Back up
+`.git` first and restore any wanted files with
+`git cat-file blob refs/original/refs/heads/main:"<path>" > "<path>"`.
+
 ## Asset pipeline (reusable)
 
 Scripts used for the Steam Deck extraction are in this session's scratchpad,
