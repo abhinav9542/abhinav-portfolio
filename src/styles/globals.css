@@ -60,6 +60,14 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
+    /* Eases the field change when a themed case study mounts. */
+    transition: background-color 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body {
+      transition: none;
+    }
   }
 
   ::selection {
@@ -83,4 +91,37 @@
 @utility text-outline-navy {
   color: transparent;
   -webkit-text-stroke: 1px color-mix(in srgb, var(--color-navy) 38%, transparent);
+}
+
+/*
+  Per-project theming.
+
+  Every Tailwind utility here compiles to `var(--color-*)`, so re-pointing the
+  palette variables on an ancestor re-themes everything beneath it — no
+  component needs to know a theme exists. Applied to <html> for a themed case
+  study (so nav, footer and body field come along) and to a single card in the
+  work grid so the grid previews the project's world.
+
+  Deliberately left UNLAYERED: Tailwind emits @theme into `@layer theme`, and
+  unlayered author styles win over layered ones regardless of specificity, so
+  this reliably overrides even when it lands on :root itself.
+
+  Values sampled from Abhinav's own industrial-design deck — #0d0d0d field,
+  #2e80ff accent, #fbfbfb headings — rather than invented.
+*/
+.theme-technical {
+  --color-cream: #0d0d0d;
+  --color-cream-dark: #17181b;
+  --color-white-soft: #131418;
+  --color-ink: #e6eaf0;
+  --color-navy: #ffffff;
+  --color-navy-soft: #cbd3de;
+  /* 7.8:1 on the field — captions run at 12px, so this sits well clear of AA. */
+  --color-warm-gray: #9aa4b2;
+  --color-sand: #24406b;
+  --color-terracotta: #2e80ff;
+  /* Lifted from the deck blue: eyebrows and links need to read ON dark
+     (7.0:1), where the deck's own #2e80ff only manages 5.2:1. */
+  --color-terracotta-dark: #5b9bff;
+  --shadow-soft: 0 24px 70px -20px rgba(0, 0, 0, 0.8);
 }

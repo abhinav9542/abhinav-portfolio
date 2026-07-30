@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { getAdjacentProjects, getProjectBySlug } from '@/data/projects'
 import { ProjectHero } from '@/components/project-detail/ProjectHero'
@@ -7,6 +8,19 @@ import { ProjectNav } from '@/components/project-detail/ProjectNav'
 export function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const project = slug ? getProjectBySlug(slug) : undefined
+  const theme = project?.theme
+
+  /**
+   * Themed case studies re-point the palette on <html> rather than on the
+   * article, so the fixed nav, the footer and the body field come along —
+   * otherwise a dark case study would sit inside a cream frame.
+   */
+  useEffect(() => {
+    if (theme !== 'technical') return
+    const root = document.documentElement
+    root.classList.add('theme-technical')
+    return () => root.classList.remove('theme-technical')
+  }, [theme])
 
   if (!project) {
     return <Navigate to="/404" replace />
@@ -18,11 +32,9 @@ export function ProjectDetailPage() {
     <article>
       <ProjectHero project={project} />
       <div className="px-6 sm:px-10">
-        <div className="mx-auto max-w-4xl">
-          {project.sections.map((section) => (
-            <ProjectSection key={section.id} section={section} />
-          ))}
-        </div>
+        {project.sections.map((section) => (
+          <ProjectSection key={section.id} section={section} />
+        ))}
       </div>
       <ProjectNav prev={prev} next={next} />
     </article>

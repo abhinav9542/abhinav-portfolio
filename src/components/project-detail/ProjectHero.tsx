@@ -24,16 +24,20 @@ export function ProjectHero({ project }: ProjectHeroProps) {
 
         <p className="mt-6 max-w-2xl text-lg text-warm-gray">{project.tagline}</p>
 
-        <div className="mt-8 flex flex-wrap gap-8 text-sm text-ink/70">
-          <div>
-            <p className="text-xs uppercase tracking-wider text-terracotta-dark">Role</p>
-            <p className="mt-1">{project.role}</p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider text-terracotta-dark">Year</p>
-            <p className="mt-1">{project.year}</p>
-          </div>
-        </div>
+        <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-6 text-sm text-ink/70">
+          {[
+            { label: 'Role', value: project.role },
+            { label: 'Year', value: project.year },
+            ...(project.meta ?? []),
+          ].map((item) => (
+            <div key={item.label}>
+              <dt className="text-xs uppercase tracking-wider text-terracotta-dark">
+                {item.label}
+              </dt>
+              <dd className="mt-1">{item.value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
 
       <div className="mx-auto mt-12 aspect-[16/9] max-w-5xl overflow-hidden rounded-3xl bg-cream-dark">

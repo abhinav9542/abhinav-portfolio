@@ -28,6 +28,10 @@ export const site = {
     { label: 'About', href: '#about' },
     { label: 'Contact', href: '#contact' },
   ] satisfies NavLink[],
-  // No social/portfolio links provided yet — add here once shared.
-  social: [] satisfies SocialLink[],
+  social: [
+    {
+      label: 'LinkedIn',
+      href: 'https://www.linkedin.com/in/abhinav-tomar-28163b218/',
+    },
+  ] satisfies SocialLink[],
 }

@@ -61,19 +61,22 @@ export function Nav() {
   return (
     <motion.header
       initial={false}
-      animate={{
-        y: hidden && !menuOpen ? '-100%' : '0%',
-        backgroundColor: menuOpen
-          ? 'rgba(250, 246, 238, 1)'
-          : scrolled
-            ? 'rgba(250, 246, 238, 0.9)'
-            : 'rgba(250, 246, 238, 0)',
-        boxShadow: scrolled ? '0 1px 0 rgba(26,36,64,0.08)' : '0 1px 0 rgba(26,36,64,0)',
-      }}
+      animate={{ y: hidden && !menuOpen ? '-100%' : '0%' }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-x-0 top-0 z-50 backdrop-blur-md"
     >
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-10">
+      {/* The bar's fill is a token-driven layer whose opacity animates, rather
+          than an animated backgroundColor: Framer needs concrete colour values,
+          which would pin the nav to cream and break it on a themed case study. */}
+      <motion.div
+        aria-hidden
+        initial={false}
+        animate={{ opacity: menuOpen ? 1 : scrolled ? 0.9 : 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute inset-0 border-b border-navy/10 bg-cream"
+      />
+
+      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-10">
         <Link to="/" className="font-display text-lg font-medium text-navy">
           {site.name}
         </Link>
@@ -133,7 +136,7 @@ export function Nav() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-navy/10 sm:hidden"
+            className="relative overflow-hidden border-t border-navy/10 sm:hidden"
           >
             <ul className="flex flex-col gap-1 px-6 py-4">
               {site.navLinks.map((link) => (

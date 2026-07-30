@@ -19,6 +19,17 @@ export function Footer() {
             {site.phone}
           </a>
           <span className="text-warm-gray">{site.location}</span>
+          {site.social.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="hover:text-terracotta-dark"
+            >
+              {link.label} ↗
+            </a>
+          ))}
         </div>
       </div>
 

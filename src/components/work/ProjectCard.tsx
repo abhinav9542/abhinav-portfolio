@@ -12,16 +12,21 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const { rotateX, rotateY, handlePointerMove, handlePointerLeave } = useProjectCardTilt()
 
   return (
-    <Link to={`/work/${project.slug}`} className="group block">
+    // A themed project previews its own world in the grid: the same palette
+    // override the case study uses, scoped to this one card.
+    <Link
+      to={`/work/${project.slug}`}
+      className={`group block h-full ${project.theme === 'technical' ? 'theme-technical' : ''}`}
+    >
       <motion.div
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
         style={{ rotateX, rotateY, transformPerspective: 800 }}
         whileHover={{ scale: 1.02 }}
         transition={{ type: 'spring', stiffness: 250, damping: 20 }}
-        className="relative overflow-hidden rounded-2xl bg-white-soft shadow-soft"
+        className="relative flex h-full flex-col overflow-hidden rounded-2xl bg-white-soft shadow-soft"
       >
-        <div className="relative aspect-[4/3] w-full overflow-hidden">
+        <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden">
           {project.coverImage ? (
             <img
               src={project.coverImage}

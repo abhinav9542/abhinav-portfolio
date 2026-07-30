@@ -44,6 +44,29 @@ export function ContactSection() {
             {site.phone}
           </a>
         </p>
+
+        {site.social.length > 0 && (
+          <ul className="mt-8 flex flex-wrap gap-3">
+            {site.social.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="group/social inline-flex items-center gap-2 rounded-full border border-navy/20 px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-terracotta hover:text-terracotta-dark"
+                >
+                  {link.label}
+                  <span
+                    aria-hidden
+                    className="inline-block transition-transform duration-300 group-hover/social:translate-x-1"
+                  >
+                    ↗
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
       </RevealOnScroll>
     </SectionWrapper>
   )

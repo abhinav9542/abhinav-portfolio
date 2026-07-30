@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { SectionWrapper } from '@/components/layout/SectionWrapper'
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
 import { AnimatedHeading } from '@/components/ui/AnimatedHeading'
-import { AvatarPlaceholder } from './AvatarPlaceholder'
+import { Avatar } from './Avatar'
 import { SkillsStrip } from './SkillsStrip'
 import { Timeline } from './Timeline'
 import { site } from '@/data/site'
@@ -21,7 +21,7 @@ export function AboutPreview() {
       <div className="grid grid-cols-1 gap-16 md:grid-cols-[320px_1fr] md:items-start">
         <RevealOnScroll className="w-full">
           <motion.div ref={avatarRef} className="w-full" style={{ y: avatarY }}>
-            <AvatarPlaceholder />
+            <Avatar />
           </motion.div>
         </RevealOnScroll>
 

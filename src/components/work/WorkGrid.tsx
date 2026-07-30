@@ -18,7 +18,7 @@ export function WorkGrid() {
 
       <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2">
         {projects.map((project, index) => (
-          <RevealOnScroll key={project.slug} delay={index * 0.08}>
+          <RevealOnScroll key={project.slug} delay={index * 0.08} className="h-full">
             <ProjectCard project={project} />
           </RevealOnScroll>
         ))}
