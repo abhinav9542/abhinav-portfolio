@@ -2,6 +2,15 @@
 
 Last updated: 30 July 2026. Read this first when resuming in a new session.
 
+**Status: built, committed, and deployed live.** Both case studies are real and
+complete. See "Deployment — LIVE" below for URLs and the one-command update
+flow. Nothing is half-finished; the open items are optional polish.
+
+> **Back up before you delete anything.** The three source PDFs are gitignored
+> and were stripped from git history, so they exist **only** on this disk and
+> in the backup zip — GitHub does not have them. See "Source material is
+> deliberately untracked".
+
 ## What this is
 
 A 3D interactive portfolio site for **Abhinav Tomar** (Interaction Designer /
@@ -169,22 +178,47 @@ but the method is what matters:
   same project — with two case studies the wrap-around otherwise showed the
   same link on both sides.
 
-## Immediate next step: deploy (still pending)
+## Deployment — LIVE
 
-Decision made: **GitHub + Vercel auto-deploy**.
+- **Live site:** https://abhinav-portfolio-amber-five.vercel.app
+- **Repo:** https://github.com/abhinav9542/abhinav-portfolio (public, `main`)
+- **Vercel:** team "Abhinav" (Hobby), project `abhinav-portfolio`, Vite preset,
+  auto-deploys on every push to `main`.
 
-Blocked on account setup. `gh` is installed and currently authenticated as
-`kaiwright7`; Abhishek chose to create a **fresh GitHub account with a
-professional username** for this instead, since the repo will be public.
+**To ship a change:** edit `src/data/projects.ts` (or wherever), then
 
-1. github.com/signup — professional username
-2. `gh auth login --hostname github.com --git-protocol https --web`, then
-   `gh auth switch` to make it active
-3. `gh repo create abhinav-portfolio --public --source=. --push`
-4. vercel.com/signup → "Continue with GitHub" → import the repo (Vite preset is
-   auto-detected) → get the live URL
+```
+git add -A && git commit -m "…" && git push
+```
 
-Weekly updates after that are `git push` → auto-redeploy, same URL.
+Vercel rebuilds automatically and the URL stays the same. No manual deploy step.
+
+`vercel.json` holds an SPA rewrite — without it a direct visit or refresh on
+`/work/<slug>` 404s, because the static host has no such file. Rewrites run
+after Vercel's filesystem check, so hashed `/assets` still serve normally.
+Verified in production: both case-study deep links return 200.
+
+**gh auth:** this machine has two GitHub accounts in keyring — `abhinav9542`
+(active, owns the repo) and `kaiwright7`. If a push ever 403s, check
+`gh auth status` and `gh auth switch --user abhinav9542`.
+
+Commits are authored as `Abhishek.Tomar <abhishek.tomar@N16768.local>`, a local
+machine identity, so they don't link to a GitHub profile. Harmless; fix with
+`git config user.email` if it ever matters.
+
+### Not done yet
+
+- The `-amber-five` suffix is Vercel's collision fallback, meaning
+  `abhinav-portfolio.vercel.app` was already taken globally. Abhishek chose to
+  keep the current name for now. To change it later: project overview →
+  **Domains** tab (NOT Settings → Domains; this Vercel UI doesn't have that) →
+  add e.g. `abhinav-tomar.vercel.app` → set as primary. Adding a domain keeps
+  the old URL alive; renaming the project in Settings → General does not.
+- Nobody has yet watched the site animate. Everything verified so far is
+  structure, colour, contrast and network — see the rAF note under environment
+  quirks. The 3D hero, scroll reveals and count-up stats were confirmed working
+  in a real browser in an earlier session and the code is untouched, but a
+  human should still open the live URL on a real device once.
 
 ## Related deliverables from earlier sessions
 
