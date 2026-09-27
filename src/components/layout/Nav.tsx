@@ -76,8 +76,10 @@ export function Nav() {
         className="absolute inset-0 border-b border-navy/10 bg-cream"
       />
 
-      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-10">
-        <Link to="/" className="font-display text-lg font-medium text-navy">
+      {/* max-w = 6xl content + horizontal padding, so the nav's edges line up
+          with SectionWrapper and the hero copy (which pad outside max-w-6xl). */}
+      <nav className="relative mx-auto flex max-w-[75rem] items-center justify-between px-6 py-5 sm:max-w-[77rem] sm:px-10">
+        <Link to="/" className="font-display text-[1.35rem] font-medium text-navy">
           {site.name}
         </Link>
 

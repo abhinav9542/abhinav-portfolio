@@ -25,6 +25,46 @@ export const projects: ProjectData[] = [
     coverImage: `${dementiaAidBase}/cover.jpg`,
     tags: ['Product Design', 'UX Research', 'Assistive Technology'],
     featured: true,
+    overview: {
+      question: 'How might everyday objects help people with dementia remember, stay calm and find their way?',
+      branches: [
+        {
+          label: 'Problem',
+          points: ['Dementia in India set to more than double by 2050.', 'Little compassionate, non-medical support at home.'],
+          image: { src: `${dementiaAidBase}/stats-chart.jpg`, alt: 'Chart of dementia cases in India projected to 2050', fit: 'contain' },
+          sectionId: 'problemStatement',
+        },
+        {
+          label: 'Research',
+          points: ['Semi-structured interviews with professionals and caregivers.', 'Thematic analysis of lived experience.'],
+          sectionId: 'research',
+        },
+        {
+          label: 'Insights',
+          points: ['Short-term forgetfulness', 'Sundowning distress at evening', 'Night-time disorientation'],
+          image: { src: `${dementiaAidBase}/challenge-sundowning.jpg`, alt: 'Storyboard of sundowning distress in the evening' },
+          sectionId: 'challenges',
+        },
+        {
+          label: 'Mem Pebble',
+          points: ['Handheld comfort for anxiety.', 'Ambient light that eases sundowning.'],
+          image: { src: `${dementiaAidBase}/pebble-render.jpg`, alt: 'Mem Pebble product render' },
+          sectionId: 'memPebble',
+        },
+        {
+          label: 'Anvika Button',
+          points: ['A clothing button that makes door signage glow as the wearer approaches.'],
+          image: { src: `${dementiaAidBase}/anvika-door.jpg`, alt: 'Door signage glowing as the Anvika Button approaches' },
+          sectionId: 'anvikaButton',
+        },
+        {
+          label: 'Prototype',
+          points: ['3D-printed PLA pebble, 10.8 × 8.2 × 11.8 cm.', 'Two buttons and an evening light.'],
+          image: { src: `${dementiaAidBase}/dev-pebble-render.jpg`, alt: 'Refined Mem Pebble prototype render' },
+          sectionId: 'productDevelopment',
+        },
+      ],
+    },
     sections: [
       {
         id: 'problemStatement',
@@ -180,6 +220,46 @@ export const projects: ProjectData[] = [
     tags: ['Industrial Design', 'Human Factors', 'Ergonomics'],
     featured: true,
     theme: 'technical',
+    overview: {
+      question: 'How might a benchmark handheld be held more comfortably, for longer?',
+      branches: [
+        {
+          label: 'Brief',
+          points: ['A refined device with a comfort ceiling.', 'Grip fatigue, thumb strain, palm pressure.'],
+          image: { src: `${steamDeckBase}/original-front.jpg`, alt: 'The current Steam Deck OLED' },
+          sectionId: 'brief',
+        },
+        {
+          label: 'Hand data',
+          points: ['Designed for the 5th-percentile female to 95th-percentile male hand.', 'Grip kept inside a 30–45 mm band.'],
+          image: { src: `${steamDeckBase}/anthro-zones.jpg`, alt: 'Anthropometric grip zones on the device' },
+          sectionId: 'anthropometry',
+        },
+        {
+          label: 'Issues',
+          points: ['7 issues found — from limited palm support to a cross D-pad that breaks thumb motion.'],
+          sectionId: 'observations',
+        },
+        {
+          label: 'Grip redesign',
+          points: ['Curved side grips, ≈ 6° outward.', 'Rear grip deepened + 8 mm.'],
+          image: { src: `${steamDeckBase}/grips-after.jpg`, alt: 'Redesigned curved side grips' },
+          sectionId: 'grips',
+        },
+        {
+          label: 'Controls',
+          points: ['Micro-dot textured trackpads.', 'Faceted 8-way disc D-pad.'],
+          image: { src: `${steamDeckBase}/dpad-after.jpg`, alt: 'Faceted disc D-pad' },
+          sectionId: 'dpad',
+        },
+        {
+          label: 'Outcome',
+          points: ['Same 298 × 117 mm envelope and controls — held better.'],
+          image: { src: `${steamDeckBase}/final-angled.jpg`, alt: 'Final rendition of the redesign', fit: 'contain' },
+          sectionId: 'finalRendition',
+        },
+      ],
+    },
     meta: [
       { label: 'Programme', value: 'M.Des Interaction Design, UPES' },
       { label: 'Guidance', value: 'Dr. Samrat Dev' },

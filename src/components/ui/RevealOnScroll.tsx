@@ -6,11 +6,13 @@ interface RevealOnScrollProps {
   delay?: number
   y?: number
   className?: string
+  id?: string
 }
 
-export function RevealOnScroll({ children, delay = 0, y = 24, className }: RevealOnScrollProps) {
+export function RevealOnScroll({ children, delay = 0, y = 24, className, id }: RevealOnScrollProps) {
   return (
     <motion.div
+      id={id}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}

@@ -12,7 +12,7 @@ export const site = {
   name: 'Abhinav Tomar',
   role: 'Interaction Designer',
   roleSub: 'UX Research',
-  tagline: 'Designing for\nthe *human* mind.',
+  tagline: 'Designing for\nthe *human* mind*.*',
   subtagline:
     'Decoding human behaviour to build intuitive, resilient, and inclusive digital and physical systems.',
   bio: "Interdisciplinary professional with a Master's in Applied Psychology and currently pursuing Interaction Design. Applied behavioral research, user psychology, and design thinking to create practical, data-driven, and user-focused solutions with strong emphasis on usability and empathy.",
@@ -26,6 +26,7 @@ export const site = {
   navLinks: [
     { label: 'Work', href: '#work' },
     { label: 'About', href: '#about' },
+    { label: 'Experience', href: '#experience' },
     { label: 'Contact', href: '#contact' },
   ] satisfies NavLink[],
   social: [

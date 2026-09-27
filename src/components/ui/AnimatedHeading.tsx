@@ -35,7 +35,7 @@ export function AnimatedHeading({
   return (
     <Tag className={className}>
       {lines.map((textLine, lineIndex) => (
-        <span key={`${textLine}-${lineIndex}`} className="block overflow-hidden">
+        <span key={`${textLine}-${lineIndex}`} className="-mb-[0.25em] block overflow-hidden pb-[0.25em]">
           <motion.span
             className="block"
             variants={container}
@@ -46,15 +46,26 @@ export function AnimatedHeading({
           >
             {textLine.split(' ').map((word, wordIndex) => {
               // Words wrapped in *asterisks* render as the italic accent,
-              // e.g. "the *human* mind." — trailing punctuation is preserved.
-              const accent = word.match(/^\*(.+)\*(\S*)$/)
+              // e.g. "the *human* mind." — surrounding text is preserved, so
+              // "mind*.*" colours just the full stop (punctuation stays upright).
+              const accent = word.match(/^([^*]*)\*(.+)\*(\S*)$/)
               return (
-                <span key={`${word}-${wordIndex}`} className="inline-block overflow-hidden mr-[0.25em] align-top">
+                // pb/-mb gives descenders (g, y, p) room inside the reveal mask
+                // without changing line spacing.
+                <span
+                  key={`${word}-${wordIndex}`}
+                  className="inline-block overflow-hidden mr-[0.25em] -mb-[0.25em] pb-[0.25em] align-top"
+                >
                   <motion.span className="inline-block" variants={line}>
                     {accent ? (
                       <>
-                        <em className="italic text-terracotta">{accent[1]}</em>
-                        {accent[2]}
+                        {accent[1]}
+                        {/^\p{P}+$/u.test(accent[2]) ? (
+                          <span className="text-terracotta">{accent[2]}</span>
+                        ) : (
+                          <em className="italic text-terracotta">{accent[2]}</em>
+                        )}
+                        {accent[3]}
                       </>
                     ) : (
                       word

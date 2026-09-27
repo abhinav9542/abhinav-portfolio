@@ -1,11 +1,13 @@
 import { SectionWrapper } from '@/components/layout/SectionWrapper'
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
 import { AnimatedHeading } from '@/components/ui/AnimatedHeading'
+import { SculptureStop } from '@/components/sculpture/SculptureStop'
 import { site } from '@/data/site'
 
 export function ContactSection() {
   return (
     <SectionWrapper id="contact">
+      <div className="relative">
       <RevealOnScroll>
         <p className="mb-4 text-xs font-medium uppercase tracking-[0.3em] text-terracotta-dark">
           Contact
@@ -68,6 +70,18 @@ export function ContactSection() {
           </ul>
         )}
       </RevealOnScroll>
+
+      {/* Final stop: the wire shell dissolves and re-forms as the logo on the core.
+          Beside the text from xl up; below it on smaller screens. */}
+      {/* The logo stands here; the full-colour core orbits around it. */}
+      <SculptureStop
+        mode="press"
+        opacity={1}
+        particles={0.3}
+        form={1}
+        className="mx-auto mt-16 h-72 w-72 xl:absolute xl:right-0 xl:top-1/2 xl:mt-0 xl:h-[min(50vh,24vw)] xl:w-[min(50vh,24vw)] xl:-translate-y-1/2"
+      />
+      </div>
     </SectionWrapper>
   )
 }

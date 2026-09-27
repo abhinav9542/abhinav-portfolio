@@ -1,12 +1,18 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Hero } from '@/components/hero/Hero'
 import { MarqueeStrip } from '@/components/home/MarqueeStrip'
 import { AboutPreview } from '@/components/about/AboutPreview'
+import { ExperienceSection } from '@/components/experience/ExperienceSection'
 import { WorkGrid } from '@/components/work/WorkGrid'
 import { StatsBar } from '@/components/stats/StatsBar'
 import { ContactSection } from '@/components/contact/ContactSection'
 import { useLenis } from '@/hooks/useLenis'
+
+// Three.js is heavy; keep it out of the initial bundle.
+const SculptureCanvas = lazy(() =>
+  import('@/components/sculpture/SculptureCanvas').then((mod) => ({ default: mod.SculptureCanvas })),
+)
 
 export function HomePage() {
   const location = useLocation()
@@ -26,9 +32,14 @@ export function HomePage() {
 
   return (
     <>
+      {/* The sculpture travels between SculptureStops placed in the sections below. */}
+      <Suspense fallback={null}>
+        <SculptureCanvas />
+      </Suspense>
       <Hero />
       <MarqueeStrip />
       <AboutPreview />
+      <ExperienceSection />
       <StatsBar />
       <WorkGrid />
       <ContactSection />

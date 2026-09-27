@@ -1,9 +1,7 @@
-import { lazy, Suspense, useRef } from 'react'
+import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { HeroCopyOverlay } from './HeroCopyOverlay'
-import { HeroFallback } from './HeroFallback'
-
-const HeroCanvas = lazy(() => import('./HeroCanvas').then((mod) => ({ default: mod.HeroCanvas })))
+import { SculptureStop } from '@/components/sculpture/SculptureStop'
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -25,9 +23,11 @@ export function Hero() {
         }}
       />
 
-      <Suspense fallback={<HeroFallback />}>
-        <HeroCanvas scrollProgress={scrollYProgress} />
-      </Suspense>
+      {/* First stop of the travelling sculpture (drawn by SculptureCanvas):
+          centred in the right-hand area, 72vh across. */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex w-full items-center justify-center md:w-[72%] lg:w-[60%]">
+        <SculptureStop mode="press" opacity={1} particles={1} className="h-[72vh] w-[72vh] shrink-0" />
+      </div>
       <HeroCopyOverlay scrollProgress={scrollYProgress} />
 
       {/* Scroll indicator */}

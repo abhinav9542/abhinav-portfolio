@@ -110,7 +110,8 @@ export function ProjectSection({ section }: ProjectSectionProps) {
   )
 
   return (
-    <RevealOnScroll className="border-t border-navy/10 py-16 first:border-none first:pt-0">
+    // The id lets the mind-map overview deep-link straight to this section.
+    <RevealOnScroll id={section.id} className="border-t border-navy/10 py-16 first:border-none first:pt-0">
       <div className={`mx-auto ${wide ? 'max-w-6xl' : 'max-w-4xl'}`}>
         {wide ? (
           // Wide case studies stack the label above the content so figures get

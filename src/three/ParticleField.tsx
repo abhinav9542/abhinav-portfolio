@@ -1,13 +1,19 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, type Ref } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { sceneConfig } from './sceneConfig'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 const COUNT = 140
+export const PARTICLE_OPACITY = 0.55
+
+interface ParticleFieldProps {
+  /** Lets the sculpture fade the field as it travels between sections. */
+  materialRef?: Ref<THREE.PointsMaterial>
+}
 
 /** Slowly drifting points orbiting the sculpture — adds depth without weight. */
-export function ParticleField() {
+export function ParticleField({ materialRef }: ParticleFieldProps) {
   const pointsRef = useRef<THREE.Points>(null)
   const reducedMotion = useReducedMotion()
 
@@ -38,11 +44,12 @@ export function ParticleField() {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
+        ref={materialRef}
         color={sceneConfig.colors.navySoft}
         size={0.035}
         sizeAttenuation
         transparent
-        opacity={0.55}
+        opacity={PARTICLE_OPACITY}
         depthWrite={false}
       />
     </points>

@@ -80,6 +80,27 @@ export interface ProjectSection {
   columns?: 1 | 2 | 3 | 4 | 5
 }
 
+/** One branch of the case-study mind map: a stage of the story in a glance. */
+export interface OverviewBranch {
+  /** Short node label, e.g. 'Problem'. */
+  label: string
+  /** One or two very short lines — the gist, not the argument. */
+  points: string[]
+  image?: ProjectImage
+  /** Section id in the detailed case study this branch expands into. */
+  sectionId: string
+}
+
+/**
+ * The compact, mind-map version of a case study shown before the detailed
+ * page. Written by hand (not derived) so every line stays crisp.
+ */
+export interface ProjectOverview {
+  /** The design question at the centre of the map. */
+  question: string
+  branches: OverviewBranch[]
+}
+
 export interface ProjectMeta {
   label: string
   value: string
@@ -103,5 +124,7 @@ export interface ProjectData {
   meta?: ProjectMeta[]
   /** True while this entry is a placeholder awaiting real case-study content. */
   isPlaceholder?: boolean
+  /** Mind-map summary shown at /work/:slug; the sections below are /work/:slug/details. */
+  overview?: ProjectOverview
   sections: ProjectSection[]
 }

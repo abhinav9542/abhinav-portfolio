@@ -4,11 +4,13 @@ import { AnimatedHeading } from '@/components/ui/AnimatedHeading'
 
 interface ProjectHeroProps {
   project: ProjectData
+  /** Less top padding when a "Back to overview" link already sits above. */
+  compactTop?: boolean
 }
 
-export function ProjectHero({ project }: ProjectHeroProps) {
+export function ProjectHero({ project, compactTop = false }: ProjectHeroProps) {
   return (
-    <header className="px-6 pb-16 pt-36 sm:px-10">
+    <header className={`px-6 pb-16 sm:px-10 ${compactTop ? 'pt-8' : 'pt-36'}`}>
       <div className="mx-auto max-w-4xl">
         <div className="flex flex-wrap gap-2">
           {project.tags.map((tag) => (

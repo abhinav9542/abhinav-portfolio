@@ -5,7 +5,7 @@ import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
 import { AnimatedHeading } from '@/components/ui/AnimatedHeading'
 import { Avatar } from './Avatar'
 import { SkillsStrip } from './SkillsStrip'
-import { Timeline } from './Timeline'
+import { SculptureStop } from '@/components/sculpture/SculptureStop'
 import { site } from '@/data/site'
 
 export function AboutPreview() {
@@ -17,24 +17,35 @@ export function AboutPreview() {
   const avatarY = useTransform(scrollYProgress, [0, 1], [40, -40])
 
   return (
-    <SectionWrapper id="about">
-      <div className="grid grid-cols-1 gap-16 md:grid-cols-[320px_1fr] md:items-start">
+    <SectionWrapper id="about" className="overflow-x-clip">
+      <div className="relative grid grid-cols-1 gap-16 md:grid-cols-[320px_1fr] md:items-start">
         <RevealOnScroll className="w-full">
           <motion.div ref={avatarRef} className="w-full" style={{ y: avatarY }}>
             <Avatar />
           </motion.div>
         </RevealOnScroll>
 
-        <div>
+        {/* min-w-0 stops the w-max skills marquee from widening this grid column past the margin */}
+        <div className="min-w-0">
           <RevealOnScroll>
             <p className="mb-4 text-xs font-medium uppercase tracking-[0.3em] text-terracotta-dark">
               About
             </p>
-            <AnimatedHeading
-              as="h2"
-              text={'Behavior first,\ninterface second.'}
-              className="font-display text-4xl leading-tight text-navy sm:text-5xl"
-            />
+            <div className="relative">
+              {/* Sculpture rests here faded. From xl up it sits just after
+                  "interface second.", its bottom level with the heading’s — positioned in em
+                  (same font size as the heading) so it tracks the text. Below
+                  xl the line is too long for that, so it keeps to the corner. */}
+              <SculptureStop
+                opacity={0.25}
+                className="absolute right-0 top-0 h-[7.2rem] w-[7.2rem] -translate-y-3/4 text-4xl sm:text-5xl md:h-[10.4rem] md:w-[10.4rem] xl:left-[9.4em] xl:right-auto xl:top-[2.5em] xl:-translate-y-full"
+              />
+              <AnimatedHeading
+                as="h2"
+                text={'Behavior first,\ninterface second.'}
+                className="font-display text-4xl leading-tight text-navy sm:text-5xl"
+              />
+            </div>
           </RevealOnScroll>
 
           <RevealOnScroll delay={0.1}>
@@ -43,10 +54,6 @@ export function AboutPreview() {
 
           <RevealOnScroll delay={0.15} className="mt-10">
             <SkillsStrip />
-          </RevealOnScroll>
-
-          <RevealOnScroll delay={0.2} className="mt-16">
-            <Timeline />
           </RevealOnScroll>
         </div>
       </div>
