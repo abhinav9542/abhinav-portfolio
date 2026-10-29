@@ -5,11 +5,19 @@ import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
 import * as THREE from 'three'
 import { sceneConfig } from './sceneConfig'
 import { ParticleField, PARTICLE_OPACITY } from './ParticleField'
-import { sculptureHit } from './sculptureStore'
+import { heroMorphStore, sculptureHit } from './sculptureStore'
 import { LogoMorph } from './LogoMorph'
 import { Electrons } from './Electrons'
+import { BlackHole, DISK_INNER, DISK_OUTER, DISK_TILT, PHOTON_RING } from './BlackHole'
+import { SCULPTURE_STYLE } from '@/theme'
+
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import type { SculptureMode } from '@/components/sculpture/SculptureStop'
+
+const IS_BLACK_HOLE = SCULPTURE_STYLE === 'blackhole'
+const DISK_SOURCE = IS_BLACK_HOLE
+  ? { inner: DISK_INNER, outer: DISK_OUTER, tilt: DISK_TILT, color: sceneConfig.colors.sand }
+  : undefined
 
 type DistortMaterialInstance = ComponentRef<typeof MeshDistortMaterial>
 
@@ -105,7 +113,11 @@ export function MindSculpture() {
   const particleMaterialRef = useRef<THREE.PointsMaterial>(null)
   const placedRef = useRef(false)
   const splitRef = useRef(0)
+  const fadeRef = useRef(1)
+  const energyRef = useRef(0)
   const formRef = useRef(0)
+  /** 0–1: how far the landing page's tap-to-logo morph has run. */
+  const heroMorphRef = useRef(0)
   const trails = useMemo(
     () =>
       TRAILS.map((trail) => ({
@@ -145,6 +157,18 @@ export function MindSculpture() {
     const { width, height } = state.size
     const target = sampleStops(height)
     if (!target) return
+
+    // Landing page: a tap on the black hole runs the same finale as Contact
+    // (disk -> logo, ring -> orbits). It eases on over ~2s, plays out only
+    // while the hero is on screen, and shrinks the sculpture a little so the
+    // orbits stay clear of the headline.
+    const wanted = heroMorphStore.get() ? 1 : 0
+    const stepSize = delta * 0.5
+    heroMorphRef.current += Math.max(-stepSize, Math.min(stepSize, wanted - heroMorphRef.current))
+    const heroness = 1 - THREE.MathUtils.smoothstep(window.scrollY, 0.12 * height, 0.75 * height)
+    const heroForm = heroMorphRef.current * heroness
+    if (heroForm > target.form) target.form = heroForm
+    target.size *= THREE.MathUtils.lerp(1, 0.5, heroForm)
     formRef.current = target.form
 
     // Viewport pixels -> world units on the z=0 plane the sculpture sits in.
@@ -185,14 +209,19 @@ export function MindSculpture() {
     const pxPerWorld = 1 / worldPerPx
     sculptureHit.x = width / 2 + travel.position.x * pxPerWorld
     sculptureHit.y = height / 2 - travel.position.y * pxPerWorld
-    sculptureHit.radius = CORE_RADIUS * travel.scale.x * group.scale.x * pxPerWorld
     sculptureHit.mode = target.opacity > 0.5 ? target.mode : 'none'
+    // The tap target must survive the logo state, when the core itself has
+    // shrunk away — so 'morph' ignores the core's own press/split scaling.
+    sculptureHit.radius =
+      CORE_RADIUS * travel.scale.x * (sculptureHit.mode === 'morph' ? 1 : group.scale.x) * pxPerWorld
     const pressed = sculptureHit.pressed && sculptureHit.mode !== 'none'
 
+    // The black hole keeps its disk edge-on to the viewer: no spin, gentler tilt.
+    const tiltScale = IS_BLACK_HOLE ? 0.35 : 1
     if (!reducedMotion) {
-      group.rotation.y += delta * 0.12
-      const targetTiltX = state.pointer.y * 0.35
-      const targetTiltZ = -state.pointer.x * 0.25
+      if (!IS_BLACK_HOLE) group.rotation.y += delta * 0.12
+      const targetTiltX = state.pointer.y * 0.35 * tiltScale
+      const targetTiltZ = -state.pointer.x * 0.25 * tiltScale
       group.rotation.x = THREE.MathUtils.lerp(group.rotation.x, targetTiltX, 0.05)
       group.rotation.z = THREE.MathUtils.lerp(group.rotation.z, targetTiltZ, 0.05)
     }
@@ -200,6 +229,8 @@ export function MindSculpture() {
     wire.rotation.y -= delta * 0.05
     wire.rotation.x += delta * 0.02
 
+    fadeRef.current = target.opacity
+    energyRef.current = THREE.MathUtils.lerp(energyRef.current, pressed ? 1 : 0, 0.08)
     const pressScale = (pressed ? 1.15 : 1) * (1 - split)
     group.scale.setScalar(THREE.MathUtils.lerp(group.scale.x, pressScale, 0.12))
 
@@ -225,11 +256,21 @@ export function MindSculpture() {
     <group ref={travelRef}>
       <Float
         speed={reducedMotion ? 0 : 1.4}
-        rotationIntensity={reducedMotion ? 0 : 0.25}
+        rotationIntensity={reducedMotion || IS_BLACK_HOLE ? 0 : 0.25}
         floatIntensity={reducedMotion ? 0 : 0.6}
       >
         <group ref={groupRef}>
-          <mesh>
+          {IS_BLACK_HOLE && (
+            <BlackHole
+              fadeRef={fadeRef}
+              energyRef={energyRef}
+              formRef={formRef}
+              splitRef={splitRef}
+              reducedMotion={reducedMotion}
+            />
+          )}
+          {/* The orb's core; hidden (but kept, so refs stay wired) for the black hole. */}
+          <mesh visible={!IS_BLACK_HOLE}>
             <icosahedronGeometry args={[CORE_RADIUS, 8]} />
             <MeshDistortMaterial
               ref={materialRef}
@@ -243,7 +284,7 @@ export function MindSculpture() {
               transparent
             />
           </mesh>
-          <mesh ref={wireRef} scale={SHELL_SCALE}>
+          <mesh ref={wireRef} scale={SHELL_SCALE} visible={!IS_BLACK_HOLE}>
             <icosahedronGeometry args={[CORE_RADIUS, 1]} />
             <meshBasicMaterial
               ref={wireMaterialRef}
@@ -254,7 +295,12 @@ export function MindSculpture() {
             />
           </mesh>
         </group>
-        <Electrons splitRef={splitRef} travelRef={travelRef} />
+        <Electrons
+          splitRef={splitRef}
+          travelRef={travelRef}
+          fromRadius={IS_BLACK_HOLE ? PHOTON_RING : undefined}
+          ringColor={IS_BLACK_HOLE ? sceneConfig.colors.rimBlue : undefined}
+        />
         {/* Outside the spinning group, so the formed logo always faces the viewer. */}
         <LogoMorph
           formRef={formRef}
@@ -262,6 +308,7 @@ export function MindSculpture() {
           wireRef={wireRef}
           travelRef={travelRef}
           shellRadius={CORE_RADIUS * SHELL_SCALE}
+          disk={DISK_SOURCE}
         />
       </Float>
       <ParticleField materialRef={particleMaterialRef} />

@@ -2,6 +2,8 @@ import { motion, useTransform, type MotionValue } from 'framer-motion'
 import { site } from '@/data/site'
 import { AnimatedHeading } from '@/components/ui/AnimatedHeading'
 import { useScrollToSection } from '@/hooks/useScrollToSection'
+import { SCULPTURE_STYLE } from '@/theme'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 interface HeroCopyOverlayProps {
   scrollProgress: MotionValue<number>
@@ -14,6 +16,9 @@ export function HeroCopyOverlay({ scrollProgress }: HeroCopyOverlayProps) {
   const subtextY = useTransform(scrollProgress, [0, 1], [0, -45])
   const ctaY = useTransform(scrollProgress, [0, 1], [0, -20])
   const scrollToSection = useScrollToSection()
+  // On phones the black hole sits behind the headline, so the logo would land
+  // on the text; the tap-to-logo is for tablets and up.
+  const canMorph = useMediaQuery('(min-width: 768px)')
 
   return (
     <motion.div
@@ -27,7 +32,7 @@ export function HeroCopyOverlay({ scrollProgress }: HeroCopyOverlayProps) {
         className="pointer-events-none absolute inset-y-0 left-0 w-full max-w-4xl"
         style={{
           background:
-            'radial-gradient(ellipse 75% 65% at 22% 48%, rgba(245,239,230,0.96), rgba(245,239,230,0.55) 60%, transparent 80%)',
+            'radial-gradient(ellipse 75% 65% at 22% 48%, color-mix(in srgb, var(--color-cream) 96%, transparent), color-mix(in srgb, var(--color-cream) 55%, transparent) 60%, transparent 80%)',
         }}
       />
 
@@ -62,7 +67,9 @@ export function HeroCopyOverlay({ scrollProgress }: HeroCopyOverlayProps) {
           >
             View Work
           </button>
-          <span className="text-xs text-warm-gray">hold to blast — dare to touch the lines</span>
+          {!(SCULPTURE_STYLE === 'blackhole' && canMorph) && (
+            <span className="text-xs text-warm-gray">hold to blast — dare to touch the lines</span>
+          )}
         </motion.div>
       </div>
     </motion.div>

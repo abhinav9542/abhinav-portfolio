@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { PerformanceMonitor } from '@react-three/drei'
 import { MindSculpture } from '@/three/MindSculpture'
 import { sceneConfig } from '@/three/sceneConfig'
 import { sculptureHit, sculptureStore } from '@/three/sculptureStore'
@@ -18,6 +19,9 @@ function useSculpturePointer() {
       hovering = next
       document.body.style.cursor = next ? 'pointer' : ''
     }
+
+    // A tap (quick press and release on the sculpture) morphs it; holding
+    // still means "blast", as before.
 
     const onMove = (event: PointerEvent) =>
       setHover(sculptureHit.mode === 'reveal' && sculptureHit.contains(event.clientX, event.clientY))
@@ -62,6 +66,9 @@ function useSculpturePointer() {
  */
 export function SculptureCanvas() {
   const isMobile = useMediaQuery('(max-width: 768px)')
+  // Render resolution: starts crisp, and drops on machines that can't keep up
+  // (the black hole is traced per pixel, which is costly on integrated GPUs).
+  const [dpr, setDpr] = useState(isMobile ? 1 : 1.5)
   useSculpturePointer()
 
   return (
@@ -69,7 +76,7 @@ export function SculptureCanvas() {
       <Canvas
         eventSource={document.getElementById('root') ?? undefined}
         eventPrefix="client"
-        dpr={isMobile ? [1, 1] : [1, 1.5]}
+        dpr={dpr}
         gl={{ alpha: true, antialias: !isMobile }}
         camera={{ fov: sceneConfig.camera.fov, position: sceneConfig.camera.position }}
       >
@@ -79,6 +86,14 @@ export function SculptureCanvas() {
         <pointLight position={[4, 1, 3]} intensity={1.2} color={sceneConfig.colors.sand} />
         {/* Cool rim from behind-left for depth against the cream field */}
         <pointLight position={[-5, -1, -3]} intensity={1.6} color={sceneConfig.colors.rimBlue} />
+        {/* Steps the render resolution down when frames run long, and back up
+            if the machine copes — smoother than a fixed high-res canvas. */}
+        <PerformanceMonitor
+          flipflops={3}
+          onDecline={() => setDpr((d) => Math.max(0.75, d - 0.25))}
+          onIncline={() => setDpr((d) => Math.min(isMobile ? 1 : 1.5, d + 0.25))}
+          onFallback={() => setDpr(0.75)}
+        />
         <MindSculpture />
       </Canvas>
     </div>

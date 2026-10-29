@@ -1,6 +1,7 @@
 import type { Ref } from 'react'
 
-export type SculptureMode = 'press' | 'reveal' | 'none'
+/** 'morph': like 'press', and a quick tap turns the sculpture into the logo (and back). */
+export type SculptureMode = 'press' | 'reveal' | 'morph' | 'none'
 
 interface SculptureStopProps {
   /** What pointer input does while the sculpture rests here. */

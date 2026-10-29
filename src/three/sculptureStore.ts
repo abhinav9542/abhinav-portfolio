@@ -36,11 +36,37 @@ export const sculptureHit = {
   x: 0,
   y: 0,
   radius: 0,
-  mode: 'none' as 'press' | 'reveal' | 'none',
+  mode: 'none' as 'press' | 'reveal' | 'morph' | 'none',
   pressed: false,
   contains(clientX: number, clientY: number) {
     return this.radius > 0 && Math.hypot(clientX - this.x, clientY - this.y) <= this.radius
   },
+}
+
+/**
+ * Landing page: whether the black hole has been tapped into the logo.
+ * Same one-source-of-truth idea as above — the scene toggles it on a tap,
+ * the DOM button toggles it too, and both stay in step.
+ */
+let heroMorphed = false
+const morphListeners = new Set<() => void>()
+
+export const heroMorphStore = {
+  get: () => heroMorphed,
+  toggle() {
+    heroMorphed = !heroMorphed
+    morphListeners.forEach((listener) => listener())
+  },
+  subscribe(listener: () => void) {
+    morphListeners.add(listener)
+    return () => {
+      morphListeners.delete(listener)
+    }
+  },
+}
+
+export function useHeroMorphed(): boolean {
+  return useSyncExternalStore(heroMorphStore.subscribe, heroMorphStore.get)
 }
 
 export function useWorkRevealed(): boolean {

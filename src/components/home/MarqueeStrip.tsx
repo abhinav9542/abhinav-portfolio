@@ -13,13 +13,22 @@ export function MarqueeStrip() {
       aria-hidden
       className="select-none overflow-hidden border-y border-navy/10 bg-cream py-6"
     >
-      <div className="flex w-max animate-marquee items-center gap-10 whitespace-nowrap motion-reduce:animate-none">
-        {sequence.map((word, index) => (
-          <span key={`${word}-${index}`} className="flex items-center gap-10">
-            <span className="font-display text-6xl text-outline-navy sm:text-7xl">{word}</span>
-            <span className="h-2.5 w-2.5 rounded-full bg-terracotta/60" />
-          </span>
-        ))}
+      {/* Same width as the page content, so the words fade out at its margins. */}
+      <div
+        className="mx-auto w-full max-w-6xl overflow-hidden px-6 sm:px-10"
+        style={{
+          maskImage: 'linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)',
+        }}
+      >
+        <div className="flex w-max animate-marquee items-center gap-10 whitespace-nowrap motion-reduce:animate-none">
+          {sequence.map((word, index) => (
+            <span key={`${word}-${index}`} className="flex items-center gap-10">
+              <span className="font-display text-6xl text-outline-navy sm:text-7xl">{word}</span>
+              <span className="h-2.5 w-2.5 rounded-full bg-terracotta/60" />
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   )

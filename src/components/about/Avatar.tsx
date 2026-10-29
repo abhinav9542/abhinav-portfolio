@@ -18,7 +18,7 @@ export function Avatar() {
         className="absolute -bottom-5 -left-5 h-32 w-32 rounded-2xl border border-navy/15"
         style={{
           backgroundImage:
-            'linear-gradient(to right, rgba(26,36,64,0.10) 1px, transparent 1px), linear-gradient(to bottom, rgba(26,36,64,0.10) 1px, transparent 1px)',
+            'linear-gradient(to right, color-mix(in srgb, var(--color-navy) 10%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--color-navy) 10%, transparent) 1px, transparent 1px)',
           backgroundSize: '20px 20px',
         }}
       />

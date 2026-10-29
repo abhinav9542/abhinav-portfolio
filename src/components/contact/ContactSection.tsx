@@ -26,14 +26,14 @@ export function ContactSection() {
       <RevealOnScroll delay={0.2} className="mt-14">
         <a
           href={`mailto:${site.email}`}
-          className="group inline-flex flex-wrap items-baseline gap-4 font-display text-3xl text-navy transition-colors hover:text-terracotta-dark sm:text-5xl"
+          className="group inline-flex flex-wrap items-baseline gap-2 font-display text-[15px] text-navy transition-colors hover:text-terracotta-dark sm:text-2xl"
         >
           <span className="underline decoration-terracotta/40 decoration-2 underline-offset-8 transition-colors group-hover:decoration-terracotta">
             {site.email}
           </span>
           <span
             aria-hidden
-            className="inline-block text-2xl text-terracotta transition-transform duration-300 group-hover:translate-x-2 sm:text-4xl"
+            className="inline-block text-xl text-terracotta transition-transform duration-300 group-hover:translate-x-1 sm:text-2xl"
           >
             →
           </span>

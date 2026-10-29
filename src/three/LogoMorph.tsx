@@ -87,7 +87,10 @@ async function buildLogoTexture(url: string, maxAnisotropy: number): Promise<THR
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const i = (y * w + x) * 4
-      const alpha = 255 - (d[i] + d[i + 1] + d[i + 2]) / 3
+      // Near-white compression noise in the artwork's background would show
+      // as a faint box, so anything that light is treated as fully clear.
+      const darkness = 255 - (d[i] + d[i + 1] + d[i + 2]) / 3
+      const alpha = Math.max(0, Math.min(255, ((darkness - 24) * 255) / 231))
       d[i] = r
       d[i + 1] = g
       d[i + 2] = b
@@ -112,6 +115,32 @@ async function buildLogoTexture(url: string, maxAnisotropy: number): Promise<THR
   texture.colorSpace = THREE.SRGBColorSpace
   texture.anisotropy = maxAnisotropy
   return texture
+}
+
+/** Number of spaghetti streams the disk is torn into. */
+const STREAMS = 7
+
+/**
+ * Points on the accretion disk (same tilt as BlackHole's disk), grouped into
+ * STREAMS narrow wedges. Each grain also gets a 0–1 position along its
+ * stream, so staggering departures by it draws each wedge out into a thread.
+ */
+function sampleDisk(count: number, inner: number, outer: number, tilt: number) {
+  const points = new Float32Array(count * 3)
+  const along = new Float32Array(count)
+  const rotation = new THREE.Euler(-Math.PI / 2 + tilt, 0, 0)
+  const v = new THREE.Vector3()
+  for (let k = 0; k < count; k++) {
+    const stream = k % STREAMS
+    const u = Math.random()
+    // Each stream is a thin wedge that trails back around the disk.
+    const a = (stream / STREAMS) * Math.PI * 2 - u * 1.4 + (Math.random() - 0.5) * 0.12
+    const r = inner + (outer - inner) * (0.4 + 0.2 * Math.random())
+    v.set(Math.cos(a) * r, Math.sin(a) * r, 0).applyEuler(rotation)
+    v.toArray(points, k * 3)
+    along[k] = u
+  }
+  return { points, along }
 }
 
 /** Evenly spaced points along the edges of the wire shell's icosahedron. */
@@ -158,6 +187,11 @@ interface LogoMorphProps {
   /** The travel group, for perspective compensation (see useFrame). */
   travelRef: RefObject<THREE.Group | null>
   shellRadius: number
+  /**
+   * Black-hole mode: matter starts on the accretion disk (not the wire
+   * shell) and spirals into the logo in stretched streams.
+   */
+  disk?: { inner: number; outer: number; tilt: number; color: string }
 }
 
 /**
@@ -165,7 +199,7 @@ interface LogoMorphProps {
  * drifts outward, then settles onto the front of the core as the logo.
  * Scroll-driven, so scrolling back up reverses it.
  */
-export function LogoMorph({ formRef, groupRef, wireRef, travelRef, shellRadius }: LogoMorphProps) {
+export function LogoMorph({ formRef, groupRef, wireRef, travelRef, shellRadius, disk }: LogoMorphProps) {
   const pointsRef = useRef<THREE.Points>(null)
   const materialRef = useRef<THREE.PointsMaterial>(null)
   const planeRef = useRef<THREE.Mesh>(null)
@@ -198,7 +232,8 @@ export function LogoMorph({ formRef, groupRef, wireRef, travelRef, shellRadius }
   }, [maxAnisotropy])
 
   const data = useMemo(() => {
-    const shell = sampleShellEdges(COUNT, shellRadius)
+    const sampled = disk ? sampleDisk(COUNT, disk.inner, disk.outer, disk.tilt) : null
+    const shell = sampled ? sampled.points : sampleShellEdges(COUNT, shellRadius)
     const scatter = new Float32Array(COUNT * 3)
     const delay = new Float32Array(COUNT)
     const dir = new THREE.Vector3()
@@ -207,8 +242,13 @@ export function LogoMorph({ formRef, groupRef, wireRef, travelRef, shellRadius }
       dir.toArray(scatter, i * 3)
       delay[i] = Math.random() * 0.35
     }
+    if (sampled) {
+      // The head of each stream leaves first and the tail follows, so every
+      // wedge is drawn out into a long thread rather than bursting.
+      for (let i = 0; i < COUNT; i++) delay[i] = 0.32 * sampled.along[i] + Math.random() * 0.03
+    }
     return { shell, scatter, delay, positions: new Float32Array(COUNT * 3) }
-  }, [shellRadius])
+  }, [shellRadius, disk])
 
   // The logo floats LOGO_Z in front of the core; off-centre, perspective would
   // push it outward from the ball. Shift it back so it projects onto the
@@ -253,9 +293,10 @@ export function LogoMorph({ formRef, groupRef, wireRef, travelRef, shellRadius }
     // settled, draw it over the core so surface bumps can't nick the strokes.
     material.depthTest = form < 0.9
 
-    // Dust starts on the wire as currently rotated and scaled.
+    // Dust starts on the wire (or the disk) as currently rotated and scaled.
     const { v, q } = scratch
-    q.copy(group.quaternion).multiply(wire.quaternion)
+    q.copy(group.quaternion)
+    if (!disk) q.multiply(wire.quaternion)
     const s = group.scale.x
     const { shell, scatter, delay, positions } = data
     const { ox, oy } = logoOffset(travel, state.camera.position.z)
@@ -266,6 +307,22 @@ export function LogoMorph({ formRef, groupRef, wireRef, travelRef, shellRadius }
       const e = easeInOutCubic(local)
       const lift = Math.sin(Math.PI * e)
       v.fromArray(shell, i3).applyQuaternion(q).multiplyScalar(s)
+      if (disk) {
+        // Spaghettification. Grains of one stream start close together and
+        // all follow the same outward spiral — staggered in time, so the
+        // stream is strung out along it as a thread. Only near the end does
+        // each grain peel off to its own place in the logo.
+        const tx = logo[i3] * LOGO_SCALE + ox
+        const ty = logo[i3 + 1] * LOGO_SCALE + oy
+        const pSpiral = THREE.MathUtils.smoothstep(e, 0, 0.7)
+        const angle = Math.atan2(v.y, v.x) + Math.PI * 2.2 * pSpiral
+        const rad = Math.hypot(v.x, v.y) * (1 - 0.3 * pSpiral) + 0.7 * Math.sin(Math.PI * pSpiral)
+        const settle = THREE.MathUtils.smoothstep(e, 0.6, 1)
+        positions[i3] = THREE.MathUtils.lerp(Math.cos(angle) * rad, tx, settle)
+        positions[i3 + 1] = THREE.MathUtils.lerp(Math.sin(angle) * rad, ty, settle)
+        positions[i3 + 2] = v.z * (1 - e) + LOGO_Z * e
+        continue
+      }
       positions[i3] = v.x * (1 - e) + (logo[i3] * LOGO_SCALE + ox) * e + scatter[i3] * lift
       positions[i3 + 1] = v.y * (1 - e) + (logo[i3 + 1] * LOGO_SCALE + oy) * e + scatter[i3 + 1] * lift
       positions[i3 + 2] = v.z * (1 - e) + LOGO_Z * e + scatter[i3 + 2] * lift
@@ -287,8 +344,8 @@ export function LogoMorph({ formRef, groupRef, wireRef, travelRef, shellRadius }
       </bufferGeometry>
       <pointsMaterial
         ref={materialRef}
-        color={sceneConfig.colors.navy}
-        size={0.045}
+        color={disk?.color ?? sceneConfig.colors.navy}
+        size={disk ? 0.032 : 0.045}
         sizeAttenuation
         transparent
         opacity={0}

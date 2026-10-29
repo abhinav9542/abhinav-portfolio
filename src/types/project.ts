@@ -26,6 +26,10 @@ export interface ProjectImage {
   aspect?: string
   /** `contain` for diagrams and drawings that must not be cropped. */
   fit?: 'cover' | 'contain'
+  /** A cut-out with a transparent background: drawn with no frame or card. */
+  bare?: boolean
+  /** CSS width of the figure inside its column, e.g. '90%'; centred. */
+  width?: string
 }
 
 /** A single measured fact — dimension, material, percentile band. */
@@ -51,6 +55,8 @@ export interface Metric {
   value: string
   label: string
   note?: string
+  /** Where the figure comes from; makes the note a link. */
+  href?: string
 }
 
 export interface ProjectSection {
@@ -101,6 +107,57 @@ export interface ProjectOverview {
   branches: OverviewBranch[]
 }
 
+/** One moment of the case study told as a story: a single line, little else. */
+export interface StoryBeat {
+  /** Tiny act marker, e.g. 'The tension'. */
+  act: string
+  /** The one line this moment says. Keep it short. */
+  line: string
+  /** At most one quiet supporting sentence. */
+  aside?: string
+  /** At most one image. */
+  image?: ProjectImage
+}
+
+/**
+ * The editorial case-study template: a run of blocks under a full-bleed hero.
+ * An image with an empty `src` renders as a labelled placeholder, so the
+ * layout can be reviewed before the final artwork exists.
+ */
+export type CaseBlock =
+  /** Opening statement, with optional headline numbers. */
+  | { kind: 'intro'; id?: string; eyebrow: string; statement: string; body?: string; stats?: Metric[] }
+  /** Text beside one large image; `flip` swaps the sides. */
+  | { kind: 'feature'; id?: string; eyebrow: string; heading: string; body: string; bullets?: string[]; image?: ProjectImage; flip?: boolean }
+  /** One image across the full content width. */
+  | { kind: 'wide'; id?: string; image: ProjectImage }
+  /** A heading over a grid of captioned images. */
+  | { kind: 'gallery'; id?: string; eyebrow: string; heading: string; body?: string; images: ProjectImage[]; columns?: 1 | 2 | 3 | 4 }
+  /** A three-panel storyboard: illustrations with real text beneath, in the site's own styling. */
+  | { kind: 'storyboard'; id?: string; eyebrow: string; heading: string; body: string; panels: { image: ProjectImage; caption: string }[] }
+  /** Side-by-side spec cards: one per product, label/value rows, optional image. */
+  | { kind: 'specs'; id?: string; eyebrow: string; heading: string; body?: string; cards: { name: string; rows: { label: string; value: string }[]; image?: ProjectImage; note?: string }[] }
+  /** A wide photo with one detail ringed and an arrow to a zoomed-in view of it. */
+  | { kind: 'callout'; id?: string; eyebrow: string; heading: string; body?: string; image: ProjectImage; ratio: number; zoom: ProjectImage; target: { x: number; y: number; rw: number; rh: number }; caption?: string }
+  /** How a product works, as picture steps joined by arrows; one row per product. */
+  | { kind: 'flow'; id?: string; eyebrow: string; heading: string; body?: string; rows: { name: string; aspect?: string; steps: { image: ProjectImage; title: string; body: string; focus?: string }[] }[] }
+  /** A numbered run of steps — process, research method, flow. */
+  | { kind: 'steps'; id?: string; eyebrow: string; heading: string; body?: string; image?: ProjectImage; steps: { title: string; body: string }[] }
+  /** A single large pull-line between sections. */
+  | { kind: 'pullquote'; line: string; aside?: string }
+  /** The closing section. */
+  | { kind: 'closing'; eyebrow: string; heading: string; body: string }
+
+export interface CaseStudy {
+  /** Role, team, tools, year — shown beside the hero title. */
+  facts: ProjectMeta[]
+  /** Big cover image behind the hero. */
+  heroImage?: ProjectImage
+  /** Flip the hero photo and put the facts top right, to keep a product at the photo's bottom visible. */
+  heroMirrored?: boolean
+  blocks: CaseBlock[]
+}
+
 export interface ProjectMeta {
   label: string
   value: string
@@ -126,5 +183,9 @@ export interface ProjectData {
   isPlaceholder?: boolean
   /** Mind-map summary shown at /work/:slug; the sections below are /work/:slug/details. */
   overview?: ProjectOverview
+  /** The detailed page told as a few beats; the full sections become an appendix. */
+  story?: StoryBeat[]
+  /** The editorial template; when present it replaces the story on the detailed page. */
+  caseStudy?: CaseStudy
   sections: ProjectSection[]
 }

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useLocation, useOutlet } from 'react-router-dom'
 import { Nav } from './Nav'
@@ -8,12 +9,19 @@ export function PageShell() {
   const location = useLocation()
   const outlet = useOutlet()
 
+  // Every page starts at its top; otherwise a case study opens at the
+  // footer, wherever the page before it was scrolled to.
+  useEffect(() => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+    if (!location.hash) window.scrollTo(0, 0)
+  }, [location.pathname, location.hash])
+
   return (
     <MotionConfig reducedMotion="user">
       <SmoothScrollProvider>
         <div className="flex min-h-screen flex-col">
           <Nav />
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
             <motion.main
               key={location.pathname}
               initial={{ opacity: 0 }}

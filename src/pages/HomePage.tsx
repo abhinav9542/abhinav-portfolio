@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Hero } from '@/components/hero/Hero'
-import { MarqueeStrip } from '@/components/home/MarqueeStrip'
 import { AboutPreview } from '@/components/about/AboutPreview'
 import { ExperienceSection } from '@/components/experience/ExperienceSection'
 import { WorkGrid } from '@/components/work/WorkGrid'
@@ -37,7 +36,6 @@ export function HomePage() {
         <SculptureCanvas />
       </Suspense>
       <Hero />
-      <MarqueeStrip />
       <AboutPreview />
       <ExperienceSection />
       <StatsBar />

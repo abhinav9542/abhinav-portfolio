@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { OverviewBranch, ProjectData, ProjectOverview } from '@/types/project'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { SITE_THEME, THEME_CLASSES } from '@/theme'
+
+/** Space themes: dark glass cards, matching the gravity well and work cards. */
+const SPACE = THEME_CLASSES[SITE_THEME].includes('theme-deepspace')
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -87,7 +91,7 @@ export function MindMap({ project, overview }: MindMapProps) {
           branchRefs.current[index] = el
         }}
         to={`/work/${project.slug}/details#${branch.sectionId}`}
-        className="group relative flex items-center gap-4 rounded-2xl border border-navy/10 bg-white-soft p-4 shadow-soft transition-colors hover:border-terracotta/50"
+        className={`group relative flex items-center gap-4 rounded-2xl p-4 transition-colors hover:border-terracotta/50 ${SPACE ? 'border border-white/10 bg-black/45 backdrop-blur-md' : 'border border-navy/10 bg-white-soft shadow-soft'}`}
       >
         {branch.image && (
           <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-cream-dark">

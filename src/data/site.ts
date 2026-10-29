@@ -14,8 +14,8 @@ export const site = {
   roleSub: 'UX Research',
   tagline: 'Designing for\nthe *human* mind*.*',
   subtagline:
-    'Decoding human behaviour to build intuitive, resilient, and inclusive digital and physical systems.',
-  bio: "Interdisciplinary professional with a Master's in Applied Psychology and currently pursuing Interaction Design. Applied behavioral research, user psychology, and design thinking to create practical, data-driven, and user-focused solutions with strong emphasis on usability and empathy.",
+    'Understanding people to design simple, inclusive digital and physical experiences.',
+  bio: "I have a Master's in Applied Psychology and am now studying Interaction Design. I combine behavioural research, an understanding of how people think, and design thinking to create practical, user-focused solutions that are easy to use and made with empathy.",
   closing: {
     heading: 'Designing the next generation\nof intuitive systems.',
     body: 'Looking forward to bringing rigorous psychological analysis and highly polished interaction design to teams solving complex, ambiguous human problems.',

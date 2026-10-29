@@ -34,6 +34,13 @@ interface ElectronsProps {
   splitRef: RefObject<number>
   /** The travel group (world offset + scale), for perspective compensation. */
   travelRef: RefObject<THREE.Group | null>
+  /**
+   * Black-hole mode: rings and electrons are born on the photon ring
+   * (radius fromRadius) and expand outward, instead of bursting out of a
+   * whole core. Rings also take ringColor and appear straight away.
+   */
+  fromRadius?: number
+  ringColor?: string
 }
 
 /**
@@ -49,7 +56,7 @@ function flatten(v: THREE.Vector3, tx: number, ty: number, s: number, camZ: numb
   return v
 }
 
-export function Electrons({ splitRef, travelRef }: ElectronsProps) {
+export function Electrons({ splitRef, travelRef, fromRadius, ringColor }: ElectronsProps) {
   const reducedMotion = useReducedMotion()
   const electronRefs = useRef<(THREE.Mesh | null)[]>([])
   const ringRefs = useRef<(THREE.LineLoop | null)[]>([])
@@ -67,14 +74,14 @@ export function Electrons({ splitRef, travelRef }: ElectronsProps) {
         return geometry
       }),
       ringMaterial: new THREE.LineBasicMaterial({
-        color: sceneConfig.colors.navy,
+        color: ringColor ?? sceneConfig.colors.navy,
         transparent: true,
         opacity: 0,
         depthWrite: false,
       }),
       quaternions: ORBITS.map((orbit) => new THREE.Quaternion().setFromEuler(orbit.rotation)),
     }
-  }, [])
+  }, [ringColor])
 
   const scratch = useMemo(() => new THREE.Vector3(), [])
 
@@ -87,19 +94,27 @@ export function Electrons({ splitRef, travelRef }: ElectronsProps) {
     const camZ = state.camera.position.z
     const visible = split > 0.001
     const spread = easeOutCubic(split)
-    ringMaterial.opacity = RING_OPACITY * THREE.MathUtils.smoothstep(split, 0.3, 1)
+    ringMaterial.opacity =
+      fromRadius !== undefined
+        ? 0.34 * THREE.MathUtils.smoothstep(split, 0, 0.25)
+        : RING_OPACITY * THREE.MathUtils.smoothstep(split, 0.3, 1)
 
     ORBITS.forEach((orbit, i) => {
       if (!reducedMotion) anglesRef.current[i] += delta * orbit.speed * (0.3 + 0.7 * split)
       const angle = anglesRef.current[i]
-      const radius = orbit.radius * spread
+      const radius =
+        fromRadius !== undefined ? THREE.MathUtils.lerp(fromRadius, orbit.radius, spread) : orbit.radius * spread
 
       const electron = electronRefs.current[i]
       if (electron) {
         electron.visible = visible
         // Pieces start large and overlapping (the core breaking apart), then
         // shrink to small electrons as they fly out to their rings.
-        electron.scale.setScalar(THREE.MathUtils.lerp(0.5, ELECTRON_SCALE, spread))
+        electron.scale.setScalar(
+          fromRadius !== undefined
+            ? ELECTRON_SCALE * THREE.MathUtils.smoothstep(split, 0, 0.35)
+            : THREE.MathUtils.lerp(0.5, ELECTRON_SCALE, spread),
+        )
         scratch.set(Math.cos(angle) * radius, Math.sin(angle) * radius, 0).applyQuaternion(quaternions[i])
         electron.position.copy(flatten(scratch, tx, ty, ts, camZ))
       }

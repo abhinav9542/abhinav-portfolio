@@ -2,8 +2,12 @@ import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { HeroCopyOverlay } from './HeroCopyOverlay'
 import { SculptureStop } from '@/components/sculpture/SculptureStop'
+import { MorphTrigger } from './MorphTrigger'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { SCULPTURE_STYLE } from '@/theme'
 
 export function Hero() {
+  const isMobile = useMediaQuery('(max-width: 767px)')
   const sectionRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -19,14 +23,23 @@ export function Hero() {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 45% 50% at 78% 30%, rgba(210,96,58,0.10), transparent 70%), radial-gradient(ellipse 40% 45% at 15% 80%, rgba(26,36,64,0.07), transparent 70%), radial-gradient(ellipse 30% 35% at 60% 85%, rgba(231,205,171,0.25), transparent 70%)',
+            'radial-gradient(ellipse 45% 50% at 78% 30%, color-mix(in srgb, var(--color-terracotta) 10%, transparent), transparent 70%), radial-gradient(ellipse 40% 45% at 15% 80%, color-mix(in srgb, var(--color-navy) 7%, transparent), transparent 70%), radial-gradient(ellipse 30% 35% at 60% 85%, color-mix(in srgb, var(--color-sand) 25%, transparent), transparent 70%)',
         }}
       />
 
       {/* First stop of the travelling sculpture (drawn by SculptureCanvas):
           centred in the right-hand area, 72vh across. */}
       <div className="pointer-events-none absolute inset-y-0 right-0 flex w-full items-center justify-center md:w-[72%] lg:w-[60%]">
-        <SculptureStop mode="press" opacity={1} particles={1} className="h-[72vh] w-[72vh] shrink-0" />
+        {/* On phones the sculpture sits behind the headline; the bright black
+            hole is dimmed there so the text stays readable. */}
+        <SculptureStop
+          mode={SCULPTURE_STYLE === 'blackhole' && !isMobile ? 'morph' : 'press'}
+          opacity={isMobile && SCULPTURE_STYLE === 'blackhole' ? 0.35 : 1}
+          particles={1}
+          className="h-[72vh] w-[72vh] shrink-0"
+        />
+        {/* Real buttons over the black hole turn it into the logo (see MorphTrigger). */}
+        {SCULPTURE_STYLE === 'blackhole' && !isMobile && <MorphTrigger />}
       </div>
       <HeroCopyOverlay scrollProgress={scrollYProgress} />
 
